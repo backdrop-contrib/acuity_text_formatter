@@ -49,6 +49,27 @@ function acuity_text_formatter_update_1300() {
 }
 
 /**
+ * Add capitalize_after_newline default and drop the unused collapse_spaces key.
+ *
+ * The newline setting has always been read by the casing engine and offered on
+ * the global settings form, but was never written to the default config, so on
+ * any site that had not saved that form the key was absent and the feature
+ * silently inert. Sites which have saved the form already hold an explicit
+ * choice, which is preserved.
+ */
+function acuity_text_formatter_update_1301() {
+  $settings_config = config('acuity_text_formatter.settings');
+
+  if ($settings_config->get('capitalize_after_newline') === NULL) {
+    $settings_config->set('capitalize_after_newline', TRUE);
+  }
+
+  $settings_config->clear('collapse_spaces');
+
+  $settings_config->save();
+}
+
+/**
  * Implements hook_uninstall().
  */
 function acuity_text_formatter_uninstall() {

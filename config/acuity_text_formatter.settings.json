@@ -4,12 +4,12 @@
     "capitalize_after_apostrophe": true,
     "capitalize_after_brackets": true,
     "capitalize_after_period": true,
+    "capitalize_after_newline": true,
     "capitalize_mc": true,
-    "collapse_spaces": true,
     "custom_replacements": [
-      {
-        "search": "mac",
-        "replace": "Mac"
-      }
+        {
+            "search": "mac",
+            "replace": "Mac"
+        }
     ]
-  }
+}
