@@ -252,7 +252,7 @@ Contributions welcome.
 ## Credits
 
 - Steve Moorhouse (Zulip: DrAlbany)
-- AI-assisted development (Google Gemini, ChatGPT)
+- Assisted by AI
 
 ---
 

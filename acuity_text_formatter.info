@@ -7,8 +7,6 @@ package = Acuity Utilities
 
 configure = admin/config/acuity-utils/acuity_text
 
-maintainers[albancomputers] = Albany Computer Services
-
 tags[] = Appearance
 tags[] = Fields
 tags[] = User Interface
