@@ -123,8 +123,20 @@ function acuity_text_formatter_menu() {
 
 /**
  * Implements hook_entity_presave().
+ *
+ * Takes the entity by value, not by reference. Backdrop invokes this hook
+ * through module_invoke_all(), which passes its arguments by value and so emits
+ * a PHP warning on every entity save for a by-reference implementation. Nothing
+ * is lost: an object variable holds a handle, so changes made here are still
+ * seen by the caller — which is exactly how the sibling hook_user_presave()
+ * below has always worked.
+ *
+ * @param object $entity
+ *   The entity being saved, altered in place.
+ * @param string $type
+ *   The entity type.
  */
-function acuity_text_formatter_entity_presave(&$entity, $type) {
+function acuity_text_formatter_entity_presave($entity, $type) {
   if ($type !== 'user') {
     _acuity_text_formatter_process_entity_fields($entity, $type);
   }
@@ -132,8 +144,13 @@ function acuity_text_formatter_entity_presave(&$entity, $type) {
 
 /**
  * Implements hook_node_presave().
+ *
+ * By value for the same reason as hook_entity_presave() above.
+ *
+ * @param object $node
+ *   The node being saved, altered in place.
  */
-function acuity_text_formatter_node_presave(&$node) {
+function acuity_text_formatter_node_presave($node) {
   _acuity_text_formatter_process_node_title($node);
 }
 
