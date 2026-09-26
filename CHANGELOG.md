@@ -2,7 +2,7 @@
 
 All notable changes to Text Formatter (Acuity Utils).
 
-## 1.x-1.4.0 (unreleased)
+## 1.x-1.4.0, 2026-09-26
 
 ### Added
 
