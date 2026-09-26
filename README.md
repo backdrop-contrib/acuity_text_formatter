@@ -22,6 +22,10 @@
 * The part before the `@` is technically case-sensitive (RFC 5321), but no
   mainstream mail provider treats it that way. Lowercasing is for consistency
   and for spotting duplicates.
+* Core already trims addresses entered through the edit form. Trimming here
+  matters for values saved in code: imports, migrations and custom scripts.
+  Feeds Tamper can trim and lowercase too, but only for each importer you set
+  it up on; this widget applies on the field, whatever the source.
 
 ---
 
