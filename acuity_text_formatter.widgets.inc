@@ -7,7 +7,7 @@ function acuity_text_formatter_field_widget_info() {
   return [
     'acuity_text_formatter_widget' => [
       'label' => t('Acuity Text Formatter'),
-      'field types' => ['text', 'text_long', 'text_with_summary'],
+      'field types' => ['text', 'text_long', 'text_with_summary', 'email'],
       'settings' => [
         'acuity_formatter_settings' => [
           'trim' => 0,
@@ -40,18 +40,31 @@ function acuity_text_formatter_field_widget_settings_form($field, $instance) {
     '#default_value' => isset($defaults['trim']) ? $defaults['trim'] : 0,
   ];
 
+  $case_options = [
+    'none' => t('- None -'),
+    'lowercase' => t('Convert to lowercase'),
+    'uppercase' => t('Convert to uppercase'),
+    'camelcase' => t('CamelCase'),
+    'intercapped' => t('Intercapped (e.g., McCallister, O\'Connor)'),
+  ];
+
+  // Only lowercasing means anything for an email address; the other modes
+  // would mangle it.
+  $is_email = $field['type'] === 'email';
+  if ($is_email) {
+    $case_options = array_intersect_key($case_options, array_flip(['none', 'lowercase']));
+  }
+
+  $default_case = isset($defaults['case_transform']) ? $defaults['case_transform'] : 'none';
+
   $form['acuity_formatter_settings']['case_transform'] = [
     '#type' => 'select',
     '#title' => t('Case Transformation'),
-    '#description' => t('Select a case transformation to apply on save.'),
-    '#options' => [
-      'none' => t('- None -'),
-      'lowercase' => t('Convert to lowercase'),
-      'uppercase' => t('Convert to uppercase'),
-      'camelcase' => t('CamelCase'),
-      'intercapped' => t('Intercapped (e.g., McCallister, O\'Connor)'),
-    ],
-    '#default_value' => isset($defaults['case_transform']) ? $defaults['case_transform'] : 'none',
+    '#description' => $is_email
+      ? t('Lowercasing keeps addresses consistent and makes duplicates easy to find. Existing values are only changed when next saved.')
+      : t('Select a case transformation to apply on save.'),
+    '#options' => $case_options,
+    '#default_value' => isset($case_options[$default_case]) ? $default_case : 'none',
   ];
 
   return $form;
@@ -88,8 +101,21 @@ function acuity_text_formatter_field_widget_settings_summary($field, $instance) 
 
 /**
  * Implements hook_field_widget_form().
+ *
+ * Text fields get a textfield or textarea on the 'value' column. Email fields
+ * mirror core's email_field_widget_form(): the 'email' column and an HTML5
+ * email input, so only the save-time formatting differs from core's widget.
  */
 function acuity_text_formatter_field_widget_form($form, &$form_state, $field, $instance, $langcode, $items, $delta, $element) {
+  if ($field['type'] === 'email') {
+    $element['email'] = $element + [
+      '#type' => 'email',
+      '#default_value' => isset($items[$delta]['email']) ? $items[$delta]['email'] : NULL,
+      '#size' => 60,
+    ];
+    return $element;
+  }
+
   $value = isset($items[$delta]['value']) ? $items[$delta]['value'] : '';
 
   // Determine if this should be a textfield (single line) or textarea (multi-line)

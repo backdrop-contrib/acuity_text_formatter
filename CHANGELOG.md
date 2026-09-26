@@ -2,6 +2,15 @@
 
 All notable changes to Text Formatter (Acuity Utils).
 
+## 1.x-1.4.0 (unreleased)
+
+### Added
+
+- The Acuity Text Formatter widget can now be used on core **Email** fields,
+  to trim and lowercase addresses on save. It keeps core's HTML5 email input
+  and address validation. Only Trim and Lowercase are offered for email
+  fields. Existing values are changed only when the entity is next saved.
+
 ## 1.x-1.3.1, 2026-07-29
 
 ### Changed

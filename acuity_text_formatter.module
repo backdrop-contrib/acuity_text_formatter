@@ -170,6 +170,14 @@ function acuity_text_formatter_user_presave($account) {
 
 /**
  * Processes configured Field API text fields for any fieldable entity.
+ *
+ * Handles text, long text, text-with-summary and email fields, but only those
+ * using this module's widget with at least one rule enabled.
+ *
+ * @param object $entity
+ *   The entity being saved, altered in place.
+ * @param string $entity_type
+ *   The entity type.
  */
 function _acuity_text_formatter_process_entity_fields(&$entity, string $entity_type): void {
   if (!is_object($entity)) {
@@ -199,7 +207,7 @@ function _acuity_text_formatter_process_entity_fields(&$entity, string $entity_t
   foreach ($instances as $field_name => $instance) {
     $field = field_info_field($field_name);
 
-    if (empty($field['type']) || !in_array($field['type'], ['text', 'text_long', 'text_with_summary'], TRUE)) {
+    if (empty($field['type']) || !in_array($field['type'], ['text', 'text_long', 'text_with_summary', 'email'], TRUE)) {
       continue;
     }
 
@@ -211,6 +219,17 @@ function _acuity_text_formatter_process_entity_fields(&$entity, string $entity_t
     $trim = !empty($settings['trim']);
     $case_transform = $settings['case_transform'] ?? 'none';
     $collapse_spaces = !empty($settings['collapse_spaces']);
+
+    // Core's email field stores its value in 'email', not 'value'. Only trim
+    // and lowercase are safe on an address; anything else is ignored.
+    $column = 'value';
+    if ($field['type'] === 'email') {
+      $column = 'email';
+      $collapse_spaces = FALSE;
+      if ($case_transform !== 'lowercase') {
+        $case_transform = 'none';
+      }
+    }
 
     if (!$trim && !$collapse_spaces && $case_transform === 'none') {
       continue;
@@ -226,8 +245,8 @@ function _acuity_text_formatter_process_entity_fields(&$entity, string $entity_t
       }
 
       foreach ($items as &$item) {
-        if (isset($item['value']) && is_string($item['value'])) {
-          $item['value'] = _acuity_text_formatter_apply_rules($item['value'], $trim, $case_transform, $collapse_spaces);
+        if (isset($item[$column]) && is_string($item[$column])) {
+          $item[$column] = _acuity_text_formatter_apply_rules($item[$column], $trim, $case_transform, $collapse_spaces);
         }
 
         if (isset($item['summary']) && is_string($item['summary'])) {
